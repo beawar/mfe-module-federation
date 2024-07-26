@@ -17,10 +17,5 @@
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "*.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "eslint.config.js",
-  ]
+  "include": ["*.ts", "**/*.ts", "**/*.tsx", "eslint.config.js"]
 }
