@@ -1,6 +1,6 @@
 {
-  "name": "shell",
-  "version": "0.0.0",
+  "name": "app2",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "NODE_OPTIONS='--loader ts-node/esm' webpack --mode=production",

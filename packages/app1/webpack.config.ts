@@ -39,8 +39,11 @@ const config = (
       template: "./public/index.html",
     }),
     new ModuleFederationPlugin({
-      name: "shell",
+      name: "app1",
       filename: "remoteEntry.js",
+      exposes: {
+        ".": "./src/app",
+      },
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
@@ -50,7 +53,7 @@ const config = (
   devServer: {
     static: "./dist",
     compress: true,
-    port: 9000,
+    port: 9001,
   },
 });
 

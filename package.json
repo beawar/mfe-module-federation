@@ -4,7 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "npm start --workspaces",
+    "start:shell": "npm start -w shell",
+    "start:app1": "npm start -w app1",
+    "start:app2": "npm start -w app2",
+    "start": "run-p start:*",
     "prepare": "husky",
     "lint": "eslint .",
     "fmt": "prettier --write --ignore-unknown ."
@@ -27,11 +30,9 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "husky": "^9.1.2",
     "lint-staged": "^15.2.7",
+    "npm-run-all": "^4.1.5",
     "prettier": "3.3.3",
     "typescript": "^5.5.4",
     "typescript-eslint": "^7.17.0"
-  },
-  "dependencies": {
-    "@module-federation/enhanced": "^0.3.2"
   }
 }
