@@ -1,12 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { useAppStore } from "../stores/app-store";
+import { type Module } from "../stores/app-store";
 import * as styles from "./primary-bar.module.css";
 
-export const PrimaryBar = () => {
-  const modules = useAppStore((state) => state.modules);
-
+export const PrimaryBar = ({ modules }: { modules: Module[] }) => {
   return (
     <nav className={styles.primaryBar}>
+      PrimaryBar
       {modules.map((module) => {
         return (
           module.route &&

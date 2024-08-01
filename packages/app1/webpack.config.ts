@@ -44,9 +44,6 @@ const config = (
     new ModuleFederationPlugin({
       name: "app1",
       filename: "remoteEntry.js",
-      remotes: {
-        shell: "shell@http://localhost:3000/remoteEntry.js",
-      },
       exposes: {
         ".": "./src/app",
       },

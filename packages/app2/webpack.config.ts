@@ -47,9 +47,6 @@ const config = (
       exposes: {
         ".": "./src/app",
       },
-      remotes: {
-        shell: "shell@http://localhost:3000/remoteEntry.js",
-      },
       shared: {
         react: { singleton: true, requiredVersion: pkg.dependencies.react },
         "react-dom": {

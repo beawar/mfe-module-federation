@@ -2,75 +2,65 @@ import React, { useEffect, useState } from "react";
 import { loadRemoteModules } from "./hooks/useRemoteModules";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { PrimaryBar } from "./components/primary-bar";
-import { useAppStore } from "./stores/app-store";
+import { type Module } from "./stores/app-store";
 
-const MainView = ({ children }: React.PropsWithChildren) => {
+const MainView = ({
+  modules,
+  children,
+}: React.PropsWithChildren<{ modules: Module[] }>) => {
   return (
     <div>
       <nav>Header</nav>
       <div>
-        <PrimaryBar />
+        <PrimaryBar modules={modules} />
         <div>{children}</div>
       </div>
     </div>
   );
 };
 
-interface RemoteItem {
-  name: string;
-  component: React.ComponentType | undefined;
-}
-
 export const App = (): React.JSX.Element => {
-  const [remotes, setRemotes] = useState<RemoteItem[]>([]);
-  const modules = useAppStore((s) => s.modules);
+  const [remotes, setRemotes] = useState<Module[]>([]);
 
   useEffect(() => {
-    void loadRemoteModules().then((result) => {
+    async function loadRemotes() {
+      const remoteModules = await loadRemoteModules();
       setRemotes(
-        result.reduce<RemoteItem[]>((accumulator, item) => {
-          if (item.status === "fulfilled") {
-            accumulator.push(item.value);
-          } else {
+        remoteModules.reduce<typeof remotes>((accumulator, item) => {
+          if (item.status === "rejected") {
             console.error(item.reason);
+            return accumulator;
+          }
+          if (item.value.apps) {
+            accumulator.push(...item.value.apps);
           }
           return accumulator;
         }, []),
       );
-    });
+    }
+
+    void loadRemotes();
   }, []);
 
   return (
     <>
-      {remotes.map(
-        (remote) => remote.component && <remote.component key={remote.name} />,
-      )}
       <BrowserRouter>
-        <Routes>
-          {modules.map((module) => {
-            return (
-              module.appView && (
-                <Route
-                  path={module.route}
-                  key={module.id}
-                  element={
-                    <MainView>
-                      <module.appView />
-                    </MainView>
-                  }
-                />
-              )
-            );
-          })}
-          <Route
-            path="/"
-            element={
-              <MainView>
-                <div>Empty view</div>
-              </MainView>
-            }
-          />
-        </Routes>
+        <MainView modules={remotes}>
+          <Routes>
+            {remotes.map((module) => {
+              return (
+                module.appView && (
+                  <Route
+                    path={module.route}
+                    key={module.id}
+                    element={<module.appView />}
+                  />
+                )
+              );
+            })}
+            <Route path="/" element={<div>Empty view</div>} />
+          </Routes>
+        </MainView>
       </BrowserRouter>
     </>
   );
