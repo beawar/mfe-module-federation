@@ -1,23 +1,26 @@
-import webpack from "webpack";
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { ModuleFederationPlugin } from "@module-federation/enhanced/webpack";
 import "webpack-dev-server";
+import pkg from "./package.json" with { type: "json" };
+import type { WebpackConfiguration } from "webpack-dev-server";
 
 interface Args {
-  mode?: webpack.Configuration["mode"];
+  mode?: WebpackConfiguration["mode"];
 }
 
 const config = (
   env: Record<string, unknown>,
   args: Args,
-): webpack.Configuration => {
+): WebpackConfiguration => {
   return {
     mode: args.mode,
+    devtool: "source-map",
     entry: "./src/index.ts",
     output: {
       path: path.resolve(import.meta.dirname, "dist"),
       filename: "index.js",
+      publicPath: "auto",
     },
     resolve: {
       extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -43,8 +46,15 @@ const config = (
         name: "shell",
         filename: "remoteEntry.js",
         shared: {
-          react: { singleton: true },
-          "react-dom": { singleton: true },
+          react: { singleton: true, requiredVersion: pkg.dependencies.react },
+          "react-dom": {
+            singleton: true,
+            requiredVersion: pkg.dependencies["react-dom"],
+          },
+        },
+        dts: true,
+        exposes: {
+          ".": "./src/app-exports.ts",
         },
       }),
     ],
@@ -53,7 +63,7 @@ const config = (
         directory: path.join(import.meta.dirname, "public"),
       },
       compress: true,
-      port: 9000,
+      port: 3000,
     },
   };
 };

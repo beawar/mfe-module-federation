@@ -1,60 +1,77 @@
 import React, { useEffect, useState } from "react";
-import { getComponents } from "./network/get-components";
-import { init, loadRemote } from "@module-federation/enhanced/runtime";
+import { loadRemoteModules } from "./hooks/useRemoteModules";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { PrimaryBar } from "./components/primary-bar";
+import { useAppStore } from "./stores/app-store";
 
-// const AppComponent = (component: CarbonioModule) => {
-// const RemoteComponent = React.lazy(() =>
-// import(component.js_entrypoint) as Promise<{ default: React.ComponentType<Record<never, never>> }>
-// );
-// const path = `${component.name}/*`;
-// return (
-//   <Route key={component.name} path={path} element={<RemoteComponent />} />
-// );
-// };
+const MainView = ({ children }: React.PropsWithChildren) => {
+  return (
+    <div>
+      <nav>Header</nav>
+      <div>
+        <PrimaryBar />
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+};
+
+interface RemoteItem {
+  name: string;
+  component: React.ComponentType | undefined;
+}
 
 export const App = (): React.JSX.Element => {
-  // const [components, setComponents] = useState<CarbonioModule[]>([]);
-  const [modules, setModules] = useState<Record<string, React.ComponentType>>(
-    {},
-  );
+  const [remotes, setRemotes] = useState<RemoteItem[]>([]);
+  const modules = useAppStore((s) => s.modules);
 
   useEffect(() => {
-    void getComponents().then((res) => {
-      console.log("components", res);
-      // setComponents(res);
-      const remotes = res.map((entry) => ({
-        name: entry.name,
-        entry: entry.js_entrypoint,
-        alias: entry.name,
-      }));
-      init({
-        name: "shell",
-        remotes,
-      });
-      console.log("processing remotes", remotes);
-      remotes.forEach((remote) => {
-        void loadRemote<{ default: React.ComponentType }>(remote.name).then(
-          (remoteModule) => {
-            console.log("load remote", remote);
-            if (remoteModule) {
-              setModules((prevState) => ({
-                ...prevState,
-                [remote.name]: remoteModule.default,
-              }));
-            }
-          },
-        );
-      });
+    void loadRemoteModules().then((result) => {
+      setRemotes(
+        result.reduce<RemoteItem[]>((accumulator, item) => {
+          if (item.status === "fulfilled") {
+            accumulator.push(item.value);
+          } else {
+            console.error(item.reason);
+          }
+          return accumulator;
+        }, []),
+      );
     });
   }, []);
 
   return (
-    <div>
-      <nav>Header</nav>
-      {/* {components.map((component) => AppComponent(component))} */}
-      {Object.values(modules).map((Component) => (
-        <Component />
-      ))}
-    </div>
+    <>
+      {remotes.map(
+        (remote) => remote.component && <remote.component key={remote.name} />,
+      )}
+      <BrowserRouter>
+        <Routes>
+          {modules.map((module) => {
+            return (
+              module.appView && (
+                <Route
+                  path={module.route}
+                  key={module.id}
+                  element={
+                    <MainView>
+                      <module.appView />
+                    </MainView>
+                  }
+                />
+              )
+            );
+          })}
+          <Route
+            path="/"
+            element={
+              <MainView>
+                <div>Empty view</div>
+              </MainView>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 };

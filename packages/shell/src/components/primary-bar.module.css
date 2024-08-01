@@ -1,0 +1,4 @@
+.primaryBar {
+  display: flex;
+  flex-direction: column;
+}

@@ -7,9 +7,7 @@ export const getComponents = (): Promise<CarbonioModule[]> =>
       throw Error(response.statusText);
     })
     .then(({ components }: { components: CarbonioModule[] }) => {
-      return components.filter(
-        ({ type }) => type === "shell" || type === "carbonio",
-      );
+      return components;
     });
 
 export interface CarbonioModule {

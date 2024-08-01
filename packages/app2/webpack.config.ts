@@ -3,6 +3,7 @@ import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { ModuleFederationPlugin } from "@module-federation/enhanced/webpack";
 import "webpack-dev-server";
+import pkg from "./package.json" with { type: "json" };
 
 interface Args {
   mode?: webpack.Configuration["mode"];
@@ -14,9 +15,11 @@ const config = (
 ): webpack.Configuration => ({
   mode: args.mode,
   entry: "./src/index.ts",
+  devtool: "source-map",
   output: {
     path: path.resolve(import.meta.dirname, "dist"),
     filename: "index.js",
+    publicPath: "auto",
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -44,16 +47,23 @@ const config = (
       exposes: {
         ".": "./src/app",
       },
-      shared: {
-        react: { singleton: true },
-        "react-dom": { singleton: true },
+      remotes: {
+        shell: "shell@http://localhost:3000/remoteEntry.js",
       },
+      shared: {
+        react: { singleton: true, requiredVersion: pkg.dependencies.react },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: pkg.dependencies["react-dom"],
+        },
+      },
+      dts: true,
     }),
   ],
   devServer: {
     static: "./dist",
     compress: true,
-    port: 9002,
+    port: 3002,
   },
 });
 

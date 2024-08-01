@@ -12,17 +12,17 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        project: true,
+        project: ["./tsconfig.eslint.json", "./packages/*/tsconfig.json"],
         tsconfigRootDir: import.meta.dirname,
         sourceType: "module",
       },
     },
   },
   {
-    files: ["**/*.js"],
+    files: ["**/*.?(m)js"],
     ...tseslint.configs.disableTypeChecked,
   },
   {
-    ignores: ["**/dist/"],
+    ignores: ["**/dist/", "**/@mf-types"],
   },
 );

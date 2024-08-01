@@ -4,6 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "build:shell": "npm run build -w shell",
+    "build:app1": "npm run build -w app1",
+    "build:app2": "npm run build -w app2",
+    "build": "run-p build:*",
     "start:shell": "npm start -w shell",
     "start:app1": "npm start -w app1",
     "start:app2": "npm start -w app2",

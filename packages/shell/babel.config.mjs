@@ -9,6 +9,7 @@ const config = {
     ],
     "@babel/preset-typescript",
   ],
+  plugins: ["@babel/plugin-syntax-import-attributes"],
 };
 
 export default config;

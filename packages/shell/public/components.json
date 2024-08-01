@@ -2,15 +2,13 @@
   "components": [
     {
       "name": "app1",
-      "js_entrypoint": "http://localhost:9001/remoteEntry.js",
-      "version": "1.0.0",
-      "type": "carbonio"
+      "js_entrypoint": "http://localhost:3001/remoteEntry.js",
+      "version": "1.0.0"
     },
     {
       "name": "app2",
-      "js_entrypoint": "http://localhost:9002/remoteEntry.js",
-      "version": "1.0.0",
-      "type": "carbonio"
+      "js_entrypoint": "http://localhost:3002/remoteEntry.js",
+      "version": "1.0.0"
     }
   ]
 }
